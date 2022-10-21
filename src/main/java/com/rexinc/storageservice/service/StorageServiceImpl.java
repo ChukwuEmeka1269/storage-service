@@ -6,12 +6,15 @@ import com.rexinc.storageservice.repository.FileDataRepository;
 import com.rexinc.storageservice.util.ImageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.apache.commons.lang3.RandomStringUtils;
+
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.UUID;
 
+
+@Service
 public class StorageServiceImpl implements StorageService {
 
     private final Logger logger = LoggerFactory.getLogger(StorageServiceImpl.class);
@@ -24,7 +27,8 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public String fileUpload(MultipartFile file) {
-        String randomAlphaNumericString = RandomStringUtils.randomAlphanumeric(16);
+//        String randomAlphaNumericString = RandomStringUtils.randomAlphanumeric(16);
+        String randomAlphaNumericString = UUID.randomUUID().toString();
         logger.info("Random Reference: " + randomAlphaNumericString);
 
         try {
@@ -43,10 +47,9 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public byte[] downloadImage(String filename) {
-        FileData dbImageData = fileDataRepository.findByName(filename)
+        FileData dbImageData = fileDataRepository.findByImageReference(filename)
                 .orElseThrow(() -> new ImageDoesNotExistException(String.format("Image with name %s does not exist", filename)));
         return ImageUtils.decompressImage(dbImageData.getImageData());
     }
-
 
 }
